@@ -1,6 +1,6 @@
 name: "SolarSynkV3"
 description: "Home Assistant add-on for syncing solar/inverter data from SynSynk.net"
-version: "10.0.1"
+version: "10.0.2"
 slug: "solar_synkv3"
 init: false
 arch:
@@ -45,6 +45,7 @@ schema:
   MQTT_Port: int?
   MQTT_Login: str?
   MQTT_Pass: password
+
 
 
 
