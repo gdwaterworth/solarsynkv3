@@ -7,11 +7,7 @@ from src.configuration.configuration import Configuration
 # "MQTT_Port": 0,
 # "MQTT_Login": "",
 # "MQTT_Pass": ""
-FIRST_RECONNECT_DELAY = 1
-RECONNECT_RATE = 2
-MAX_RECONNECT_COUNT = 12
-MAX_RECONNECT_DELAY = 60
-topic = "python/mqtt"
+
 
 # Generate a Client ID with the publish prefix.
 client_id = f'publish-{random.randint(0, 1000)}'
@@ -19,6 +15,10 @@ client_id = f'publish-{random.randint(0, 1000)}'
 class MqttClient:
 
     def connect_mqtt():
+        FIRST_RECONNECT_DELAY = 1
+        RECONNECT_RATE = 2
+        MAX_RECONNECT_COUNT = 12
+        MAX_RECONNECT_DELAY = 60
         def on_disconnect(client, userdata, rc):
             print(f"Disconnected with result code: `{rc}`")
             reconnect_count, reconnect_delay = 0, FIRST_RECONNECT_DELAY
