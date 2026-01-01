@@ -12,7 +12,6 @@ COPY run.sh /
 COPY main.py /
 COPY getapi.py /
 COPY gettoken.py /
-COPY postapi.py /
 COPY settingsmanager.py /
 COPY src/ /src/
 

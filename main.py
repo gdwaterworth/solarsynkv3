@@ -1,6 +1,5 @@
 import gettoken
 import getapi
-import postapi
 import settingsmanager
 import os
 import json
@@ -57,7 +56,7 @@ def fetch_data(api_function, BearerToken, serialitem, description):
 
 #Start the Loop
 print("------------------------------------------------------------------------------")
-print("-- " + ConsoleColor.MAGENTA + f"Running Script SolarSynkV3" + ConsoleColor.ENDC)
+print("-- " + ConsoleColor.MAGENTA + f"Running Script SolarSynkMqqtv1" + ConsoleColor.ENDC)
 print("-- " + "Using API Endpoint: " + ConsoleColor.MAGENTA + json_settings['API_Server'] + ConsoleColor.ENDC )
 print("-- https://github.com/martinville/solarsynkv3")
 print("------------------------------------------------------------------------------")   
@@ -89,80 +88,29 @@ if BearerToken:
             os.remove(settings_file)
             print("Old settings.json file removed.")
 
-        # Test API connection
-        print(ConsoleColor.WARNING + "Testing HA API" + ConsoleColor.ENDC)
-        varContest = postapi.ConnectionTest("TEST", "A", "current", "connection_test", "connection_test_current", "100")
+        # Define API calls
+        api_calls = [
+            (getapi.GetInverterInfo, "Inverter Information"),
+            (getapi.GetPvData, "PV Data"),
+            (getapi.GetGridData, "Grid Data"),
+            (getapi.GetBatteryData, "Battery Data"),
+            (getapi.GetLoadData, "Load Data"),
+            (getapi.GetOutputData, "Output Data"),
+            (getapi.GetDCACTemp, "DC & AC Temperature Data"),
+            (getapi.GetInverterSettingsData, "Inverter Settings")
+        ]
 
-        if varContest == "Connection Success":
-            print(varContest)
+        # Start threaded API calls
+        threads = []
+        for api_function, description in api_calls:
+            thread = threading.Thread(target=fetch_data, args=(api_function, BearerToken, serialitem, description))
+            threads.append(thread)
+            thread.start()
 
-            # Define API calls
-            api_calls = [
-                (getapi.GetInverterInfo, "Inverter Information"),
-                (getapi.GetPvData, "PV Data"),
-                (getapi.GetGridData, "Grid Data"),
-                (getapi.GetBatteryData, "Battery Data"),
-                (getapi.GetLoadData, "Load Data"),
-                (getapi.GetOutputData, "Output Data"),
-                (getapi.GetDCACTemp, "DC & AC Temperature Data"),
-                (getapi.GetInverterSettingsData, "Inverter Settings")
-            ]
+        for thread in threads:
+            thread.join()
 
-            # Start threaded API calls
-            threads = []
-            for api_function, description in api_calls:
-                thread = threading.Thread(target=fetch_data, args=(api_function, BearerToken, serialitem, description))
-                threads.append(thread)
-                thread.start()
-
-            for thread in threads:
-                thread.join()
-
-            print(ConsoleColor.OKGREEN + "All API calls completed successfully!" + ConsoleColor.ENDC)
-
-            print("Checking if settings can be processed and flushed...")
-
-            # BOF CHECK SETTINGS ENTITY's EXISTENCE
-            # SETUP VARS
-            SUPERVISOR_URL = os.getenv("SUPERVISOR", "http://supervisor")
-            SUPERVISOR_TOKEN = os.getenv("SUPERVISOR_TOKEN")
-            url = f"{SUPERVISOR_URL}/core/api/states/input_text.solarsynkv3_{serialitem}_settings"
-            print(ConsoleColor.MAGENTA + "URL --> " + url + ConsoleColor.ENDC)
-            
-            headers = {
-                "Authorization": f"Bearer {SUPERVISOR_TOKEN}",
-                "Content-Type": "application/json",
-            }
-            
-            # Connect and get settings entity response details
-            try:
-                response = requests.get(url, headers=headers, timeout=5)
-                if response.status_code == 200:
-                    print(ConsoleColor.OKGREEN + f"URL exists (Status code: {response.status_code}) Settings may be processed and flushed." + ConsoleColor.ENDC)
-                    SettingsExist = True
-                else:
-                    print(ConsoleColor.FAIL + f"Error: Unable to connect to Home Assistant Settings via the API HTTP Error: {response.status_code}. Settings will not be processed or applied. Please create a text entity manually named: [solarsynkv3_{serialitem}_settings]" + ConsoleColor.ENDC)
-                    SettingsExist = False
-            
-            except requests.RequestException as e:
-                print(f"Error connecting: {e}")
-                SettingsExist = False
-            # EOF CHECK SETTINGS ENTITY's EXISTENCE
-     
-
-
-
-            
-            if SettingsExist==True:
-                # Download and process inverter settings
-                settingsmanager.DownloadProviderSettings(BearerToken, str(serialitem))
-                settingsmanager.GetNewSettingsFromHAEntity(BearerToken, str(serialitem))                
-                # Clear old settings to prevent re-sending
-                settingsmanager.ResetSettingsEntity(serialitem)
-
-        else:
-            print(ConsoleColor.FAIL + varContest + ConsoleColor.ENDC)
-            print(ConsoleColor.MAGENTA + "Ensure correct IP, port, and Home Assistant accessibility." + ConsoleColor.ENDC)
+        print(ConsoleColor.OKGREEN + "All API calls completed successfully!" + ConsoleColor.ENDC)
 
         # Script completion time
         VarCurrentDate = datetime.now()

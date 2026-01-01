@@ -1,5 +1,4 @@
-![](https://raw.githubusercontent.com/martinville/solarsynkv3/refs/heads/main/www/logo.png)
-
+Very early fork to implement Sunsynk Scraping into MQTT 
 
 Integrate your Sunsynk account with Home Assistant for real-time solar energy monitoring. Track power generation, battery storage, and grid usage while enabling smart automations and custom alerts. Optimize energy efficiency, reduce costs, and stay in control with seamless remote access and intuitive dashboards.
 
