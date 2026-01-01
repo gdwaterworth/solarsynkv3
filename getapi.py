@@ -77,10 +77,10 @@ def GetInverterSettingsData(Token,Serial):
         parsed_inverter_json = response.json()
 
         if parsed_inverter_json.get('msg') == "Success":           
-            print(ConsoleColor.BOLD + "PV data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
+            print(ConsoleColor.BOLD + "Settings data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
             #print(parsed_inverter_json);
         else:
-            print("PV data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
+            print("Settings data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
     except requests.exceptions.Timeout:
         print(ConsoleColor.FAIL + "Error: Request timed out while connecting to Service Provider API." + ConsoleColor.ENDC)
