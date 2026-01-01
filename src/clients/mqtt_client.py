@@ -46,7 +46,6 @@ class MqttClient:
         username = json_settings["MQTT_Login"]
         print(f"Login: `{username}`")
         password = json_settings["MQTT_Pass"]
-        print(f"Password: `{password}`")
         broker = json_settings["MQTT_Server"]
         print(f"Broker: `{broker}`")
         port = json_settings["MQTT_Port"]

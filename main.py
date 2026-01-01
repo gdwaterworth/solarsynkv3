@@ -1,6 +1,5 @@
 import gettoken
 import getapi
-import settingsmanager
 import os
 import json
 import requests
