@@ -69,12 +69,12 @@ if BearerToken:
     for serialitem in inverterserials:
         print(ConsoleColor.OKCYAN + f"Getting {serialitem} @ {VarCurrentDate}" + ConsoleColor.ENDC)
         print("Script refresh rate set to: " + ConsoleColor.OKCYAN + str(json_settings['Refresh_rate']) + ConsoleColor.ENDC + " milliseconds")
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetInverterInfo(serialitem,BearerToken))
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetPvData(serialitem,BearerToken))
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetGridData(serialitem,BearerToken))
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetBatteryData(serialitem,BearerToken))
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetLoadData(serialitem,BearerToken))
-        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetOutputData(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetInverterInfo(BearerToken,serialitem))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetPvData(BearerToken,serialitem))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetGridData(BearerToken,serialitem))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetBatteryData(BearerToken,serialitem))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetLoadData(BearerToken,serialitem))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetOutputData(BearerToken,serialitem))
         print(ConsoleColor.OKGREEN + "All API calls completed successfully!" + ConsoleColor.ENDC)
 
         # Script completion time
