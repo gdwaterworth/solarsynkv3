@@ -68,8 +68,8 @@ class MqttClient:
                         current_key_path = f"{parent_key}[{index}]"
                         step_through_json(item, current_key_path)
                 else:
-                    print(f"Key Path: '{parent_key}', Value: '{data}', Type: {type(data).__name__}")
-                    result = client.publish(topic+"/"+parent_key.replace(".","/"), data)
+                    print(f"Key Path: '{current_key_path}', Value: '{data}', Type: {type(data).__name__}")
+                    result = client.publish(topic+"/"+current_key_path.replace(".","/"), data)
                     status = result[0]
                     if status == 0:
                         print(f"Send `{msg}` to topic `{topic}`")
