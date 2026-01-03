@@ -72,8 +72,8 @@ class MqttClient:
                     result = client.publish(topic+"/"+current_key_path.replace(".","/"), data)
                     status = result[0]
                     if status == 0:
-                        print(f"Send `{msg}` to topic `{topic}`")
+                        print(f"Send `{msg}` to topic `{topic+"/"+current_key_path.replace(".","/")}`")
                     else:
-                        print(f"Failed to send message to topic {topic}")
+                        print(f"Failed to send message to topic {topic+"/"+current_key_path.replace(".","/")}")
             step_through_json(msg,'')
 
