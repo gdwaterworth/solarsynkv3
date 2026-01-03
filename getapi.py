@@ -1,7 +1,6 @@
 import logging
 import json
 import requests
-from src.clients.mqtt_client import MqttClient as mqttclient
 from datetime import datetime
 
 class ConsoleColor:    
@@ -43,7 +42,8 @@ def GetInverterInfo(Token,Serial):
 
         if parsed_inverter_json.get('msg') == "Success":
             print("Inverter fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
-            #print(parsed_inverter_json);            
+            #print(parsed_inverter_json);   
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("Inverter fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -79,6 +79,7 @@ def GetInverterSettingsData(Token,Serial):
         if parsed_inverter_json.get('msg') == "Success":           
             print(ConsoleColor.BOLD + "Settings data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
             #print(parsed_inverter_json);
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("Settings data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -112,6 +113,7 @@ def GetPvData(Token,Serial):
         if parsed_inverter_json.get('msg') == "Success":           
             print(ConsoleColor.BOLD + "PV data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
             #print(parsed_inverter_json);
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("PV data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -143,6 +145,7 @@ def GetGridData(Token,Serial):
         if parsed_inverter_json.get('msg') == "Success": 
             print(ConsoleColor.BOLD + "Grid data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
             #print(parsed_inverter_json)
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("Grid data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -174,6 +177,7 @@ def GetBatteryData(Token,Serial):
         if parsed_inverter_json.get('msg') == "Success": 
             print(ConsoleColor.BOLD + "Battery data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
             #print(parsed_inverter_json)
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("Battery data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -203,7 +207,8 @@ def GetLoadData(Token,Serial):
 
         if parsed_inverter_json.get('msg') == "Success":           
             print(ConsoleColor.BOLD + "Load data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
-            #print(parsed_inverter_json)            
+            #print(parsed_inverter_json)
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None
         else:
             print("Load data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -234,7 +239,8 @@ def GetOutputData(Token,Serial):
 
         if parsed_inverter_json.get('msg') == "Success":           
             print(ConsoleColor.BOLD + "Output data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
-            #print(parsed_inverter_json)            
+            #print(parsed_inverter_json)
+            return parsed_inverter_json['data'] if 'data' in parsed_inverter_json else None           
         else:
             print("Output data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
 
@@ -246,41 +252,7 @@ def GetOutputData(Token,Serial):
 
     except json.JSONDecodeError:
         print(ConsoleColor.FAIL + "Error: Failed to parse Service Provider API response." + ConsoleColor.ENDC)         
-
-def GetDCACTemp(Token,Serial):    
-    global api_server       
-    VarCurrentDate = datetime.today().strftime('%Y-%m-%d')
-    #print(VarCurrentDate)
-    inverter_url = f"https://{api_server}/api/v1/inverter/{Serial}/output/day?lan=en&date={VarCurrentDate}&column=dc_temp,igbt_temp"
-    # Headers (Fixed Bearer token format)
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {Token}"
-    }
-
-    try:
-        # Corrected to use GET request
-        response = requests.get(inverter_url, headers=headers, timeout=10)
-        response.raise_for_status()
-
-        parsed_inverter_json = response.json()
-
-        if parsed_inverter_json.get('msg') == "Success":           
-            print(ConsoleColor.BOLD + "Inverter data fetch response: " + ConsoleColor.OKGREEN + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
-            #print(str(parsed_inverter_json))
-            #DC Temp              
-            LastRecNum=len(parsed_inverter_json['data']['infos'][0]['records'])-1
-        else:
-            print("Inverter data fetch response: " + ConsoleColor.FAIL + parsed_inverter_json['msg'] + ConsoleColor.ENDC)
-
-    except requests.exceptions.Timeout:
-        print(ConsoleColor.FAIL + "Error: Request timed out while connecting to Service Provider API." + ConsoleColor.ENDC)
-
-    except requests.exceptions.RequestException as e:
-        print(ConsoleColor.FAIL + f"Error: Failed to connect to Service Provider API. {e}" + ConsoleColor.ENDC)
-
-    except json.JSONDecodeError:
-        print(ConsoleColor.FAIL + "Error: Failed to parse Service Provider API response." + ConsoleColor.ENDC)         
+       
 
 
 

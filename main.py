@@ -6,6 +6,7 @@ import requests
 import threading
 import logging
 import traceback
+from src.clients.mqtt_client import MqttClient as mqttclient
 from datetime import datetime
 
 # Define console colors for readability
@@ -41,17 +42,6 @@ inverterserials = str(json_settings['sunsynk_serial']).split(";")
 
 # Function to safely fetch data using threading
 
-def fetch_data(api_function, BearerToken, serialitem, description):
-    try:
-        print(f"{ConsoleColor.WARNING}Fetching {description}...{ConsoleColor.ENDC}")
-        api_function(BearerToken, str(serialitem))
-    except Exception as e:
-        logging.error(f"Error fetching {description}: {e}")
-        print(ConsoleColor.FAIL + f"Error fetching {description}: {e}" + ConsoleColor.ENDC)
-        print(traceback.format_exc())
-
-
-
 
 #Start the Loop
 print("------------------------------------------------------------------------------")
@@ -59,6 +49,8 @@ print("-- " + ConsoleColor.MAGENTA + f"Running Script SolarSynkMqqtv1" + Console
 print("-- " + "Using API Endpoint: " + ConsoleColor.MAGENTA + json_settings['API_Server'] + ConsoleColor.ENDC )
 print("-- https://github.com/martinville/solarsynkv3")
 print("------------------------------------------------------------------------------")   
+# Connect MQTT
+client = mqttclient.connect_mqtt()
 
 # Get Bearer Token
 BearerToken=""
@@ -75,45 +67,19 @@ except Exception as e:
 # Iterate through all inverters (Only if bearer exist)
 if BearerToken:       
     for serialitem in inverterserials:
-        
         print(ConsoleColor.OKCYAN + f"Getting {serialitem} @ {VarCurrentDate}" + ConsoleColor.ENDC)
-        
         print("Script refresh rate set to: " + ConsoleColor.OKCYAN + str(json_settings['Refresh_rate']) + ConsoleColor.ENDC + " milliseconds")
-
-
-        print("Cleaning cache...")
-        settings_file = "settings.json"
-        if os.path.exists(settings_file):
-            os.remove(settings_file)
-            print("Old settings.json file removed.")
-
-        # Define API calls
-        api_calls = [
-            (getapi.GetInverterInfo, "Inverter Information"),
-            (getapi.GetPvData, "PV Data"),
-            (getapi.GetGridData, "Grid Data"),
-            (getapi.GetBatteryData, "Battery Data"),
-            (getapi.GetLoadData, "Load Data"),
-            (getapi.GetOutputData, "Output Data"),
-            (getapi.GetDCACTemp, "DC & AC Temperature Data"),
-            (getapi.GetInverterSettingsData, "Inverter Settings")
-        ]
-
-        # Start threaded API calls
-        threads = []
-        for api_function, description in api_calls:
-            thread = threading.Thread(target=fetch_data, args=(api_function, BearerToken, serialitem, description))
-            threads.append(thread)
-            thread.start()
-
-        for thread in threads:
-            thread.join()
-
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetInverterInfo(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetPvData(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetGridData(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetBatteryData(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetLoadData(serialitem,BearerToken))
+        mqttclient.publish(client,"sunsynk/"+serialitem+"/inverterinfo",getapi.GetOutputData(serialitem,BearerToken))
         print(ConsoleColor.OKGREEN + "All API calls completed successfully!" + ConsoleColor.ENDC)
 
         # Script completion time
         VarCurrentDate = datetime.now()
         print(f"Script completion time: {ConsoleColor.OKBLUE} {VarCurrentDate} {ConsoleColor.ENDC}") 
 
-
+client.disconnect()
 print(ConsoleColor.OKBLUE + "Script execution completed." + ConsoleColor.ENDC)
