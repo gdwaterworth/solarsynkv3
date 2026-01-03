@@ -58,10 +58,22 @@ class MqttClient:
         return client
         
     def publish(client,topic,msg):
-            result = client.publish(topic, msg)
-            status = result[0]
-            if status == 0:
-                print(f"Send `{msg}` to topic `{topic}`")
-            else:
-                print(f"Failed to send message to topic {topic}")
+            def step_through_json(data, parent_key=''):
+                if isinstance(data, dict):
+                    for key, value in data.items():
+                        current_key_path = f"{parent_key}.{key}" if parent_key else key
+                        step_through_json(value, current_key_path)
+                elif isinstance(data, list):
+                    for index, item in enumerate(data):
+                        current_key_path = f"{parent_key}[{index}]"
+                        step_through_json(item, current_key_path)
+                else:
+                    print(f"Key Path: '{parent_key}', Value: '{data}', Type: {type(data).__name__}")
+                    result = client.publish(topic+"/"+parent_key.replace(".","/"), data)
+                    status = result[0]
+                    if status == 0:
+                        print(f"Send `{msg}` to topic `{topic}`")
+                    else:
+                        print(f"Failed to send message to topic {topic}")
+            step_through_json(msg,'')
 
