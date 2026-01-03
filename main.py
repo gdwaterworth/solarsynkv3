@@ -81,5 +81,6 @@ if BearerToken:
         VarCurrentDate = datetime.now()
         print(f"Script completion time: {ConsoleColor.OKBLUE} {VarCurrentDate} {ConsoleColor.ENDC}") 
 
-client.disconnect()
+mqttclient.disconnect(client)
+
 print(ConsoleColor.OKBLUE + "Script execution completed." + ConsoleColor.ENDC)
